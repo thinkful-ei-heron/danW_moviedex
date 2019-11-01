@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const app = express();
+const { PORT } = require('./config');
 
 const morganSetting = process.env.NODE_ENV === 'production' ? 'tiny' : 'common';
 app.use(morgan(morganSetting));
@@ -59,11 +60,7 @@ app.use((error, req, res, next) => {
   res.status(500).json(response);
 });
 
-const PORT = process.env.PORT || 8000;
-
 app.get('/movie', handleGetMovie);
-
-const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
