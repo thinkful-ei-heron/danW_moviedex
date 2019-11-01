@@ -1,16 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const app = express();
-app.use(morgan('dev'));
+
+const morganSetting = process.env.NODE_ENV === 'production' ? 'tiny' : 'common';
+app.use(morgan(morganSetting));
 app.use(helmet());
 app.use(cors());
-require('dotenv').config();
 
 const MOVIES = require('./movies.json');
 
-function handleGetMovie(req, res){
+function handleGetMovie(req, res) {
   let response = MOVIES;
   let genreQuery = req.query.genre;
   if (genreQuery) {
@@ -20,7 +22,7 @@ function handleGetMovie(req, res){
 
   let countryQuery = req.query.country;
   if (countryQuery) {
-    countryQuery= req.query.country.charAt(0).toUpperCase() + req.query.country.toLowerCase().slice(1);
+    countryQuery = req.query.country.charAt(0).toUpperCase() + req.query.country.toLowerCase().slice(1);
     response = response.filter(movie => movie.country.includes(countryQuery));
   }
 
@@ -41,15 +43,27 @@ app.use(function validateBearerToken(req, res, next) {
   const authToken = req.get('Authorization');
   const apiToken = process.env.API_TOKEN;
 
-  if(!authToken || authToken.split(' ')[1] !== apiToken){
-    return res.status(401).json({error: 'Unauthorized request'});
+  if (!authToken || authToken.split(' ')[1] !== apiToken) {
+    return res.status(401).json({ error: 'Unauthorized request' });
   }
   next();
 });
 
+app.use((error, req, res, next) => {
+  let response;
+  if (process.env.NODE_ENV === 'production') {
+    response = { error: { message: 'server error' } };
+  } else {
+    response = { error };
+  }
+  res.status(500).json(response);
+});
+
+const PORT = process.env.PORT || 8000;
+
 app.get('/movie', handleGetMovie);
 
-const PORT = 8000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);

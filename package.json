@@ -1,5 +1,5 @@
 {
-  "name": "moviedex-api",
+  "name": "moviedex",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,9 @@
     "dev": "nodemon server.js"
   },
   "keywords": [],
+  "engines": {
+    "node": "10.16.3"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
